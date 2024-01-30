@@ -1,7 +1,7 @@
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
 const gravatar = require('gravatar');
-
+const { sendEmail } = require('../../utils');
 const { User } = require('../../models');
 const HttpError = require('../../utils');
 
@@ -25,7 +25,37 @@ const register = async ({ body }, res) => {
 		},
 	});
 };
-
+const verifyEmail = async (req, res) => {
+	const { verificationToken } = req.params;
+  
+	const user = await User.findOne({ verificationToken });
+  
+	if (!user) throw HttpError(404, 'User Not Found');
+  
+	await User.findByIdAndUpdate(user._id, {
+	  verify: true,
+	  verificationToken: null,
+	});
+  
+	res.json({
+	  message: 'Verification successful',
+	});
+  };
+  
+  const resendVerifyEmail = async (req, res) => {
+	const { email } = req.body;
+	const user = await User.findOne({ email });
+  
+	if (!user) throw HttpError(401, 'Email not found');
+  
+	if (user.verify) throw HttpError(400, 'Verification has already been passed');
+  
+	await sendEmail(email, user.verificationToken);
+  
+	res.json({
+	  message: 'Verification email sent',
+	});
+  };
 const login = async ({ body }, res) => {
 	const { email, password } = body;
 	const user = await User.findOne({ email });
@@ -65,4 +95,6 @@ module.exports = {
 	register,
 	login,
 	logout,
+	verifyEmail,
+	resendVerifyEmail,
 };

@@ -1,5 +1,5 @@
 const { Contact } = require('../models');
-const { HttpError } = require('../utils');
+const HttpError = require('../utils');
 
 const checkOwner = ({ params, user }, _res, next) => {
 	const { contactId } = params;
