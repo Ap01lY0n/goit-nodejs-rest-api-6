@@ -1,37 +1,35 @@
-const multer = require('multer');
-const path = require('path');
+import multer from 'multer';
+import path from 'path';
+import { HttpError } from '../helpers/HttpError.js';
 
 const tempDir = path.resolve('temp');
-const avatarsDir = path.resolve('public/avatars');
 
-const storage = multer.diskStorage({
-  destination: (req, file, cb) => {
-    cb(null, tempDir);
-  },
+const multerConfig = multer.diskStorage({
+  destination: tempDir,
   filename: (req, file, cb) => {
     cb(null, file.originalname);
   },
 });
 
-const fileFilter = (req, file, cb) => {
-  if (file.mimetype.includes('image')) {
-    cb(null, true);
-    return;
-  }
-  cb(null, false);
-};
+const maxSize = 1.5 * 1024 * 1024; // 1mb
 
-const limits = {
-  fileSize: 1024 * 1024,
-};
+export const upload = multer({
+  storage: multerConfig,
+  fileFilter: (req, file, cb) => {
+    if (file.filename !== 'avatar') cb(null, false);
 
-const upload = multer({
-  storage,
-  fileFilter,
-  limits,
+    if (
+      file.mimetype === 'image/png' ||
+      file.mimetype === 'image/jpg' ||
+      file.mimetype === 'image/jpeg'
+    ) {
+      cb(null, true);
+    } else {
+      cb(null, false);
+      return cb(new Error('Only .png, .jpg, and .jpeg format allowed!'));
+    }
+  },
+  limits: {
+    fileSize: maxSize,
+  },
 });
-
-module.exports = {
-  upload,
-  avatarsDir,
-};

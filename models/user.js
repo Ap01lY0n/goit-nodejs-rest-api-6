@@ -1,77 +1,49 @@
-const { Schema, model } = require('mongoose');
-const Joi = require('joi');
+import { Schema, model } from 'mongoose';
+import { handleMongooseError } from './hooks.js';
+import { emailRegexp, subscriptionList } from '../constans/user-constans.js';
 
-const emailRegexp = /^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/;
-const typeSubscription = ['starter', 'pro', 'business'];
-
-const userRegisterSchema = new Schema(
-	{
-		name: {
-			type: String,
-			required: [true, 'Set name for user'],
-		},
-		email: {
-			type: String,
-			match: emailRegexp,
-			unique: true,
-			required: [true, 'Set email for user'],
-		},
-		password: {
-			type: String,
-			minlength: 6,
-			required: [true, 'Set password for user'],
-		},
-		subscription: {
-			type: String,
-			enum: typeSubscription,
-			default: 'starter',
-		},
-		token: {
-			type: String,
-			default: null,
-		},
-		avatarURL: {
-			type: String,
-			required: true,
-		},
-	},
-	{ versionKey: false, timestamps: true }
+const userSchema = new Schema(
+  {
+    password: {
+      type: String,
+      required: [true, 'Set password for user'],
+    },
+    email: {
+      type: String,
+      match: [emailRegexp, 'Invalid email format provided'],
+      required: [true, 'Email is required'],
+      index: true,
+      unique: true,
+    },
+    name: {
+      type: String,
+      required: true,
+    },
+    subscription: {
+      type: String,
+      enum: subscriptionList,
+      default: 'starter',
+    },
+    token: {
+      type: String,
+      default: null,
+    },
+    avatarURL: {
+      type: String,
+      required: true,
+    },
+    verify: {
+      type: Boolean,
+      default: false,
+    },
+    verificationToken: {
+      type: String,
+      default: null,
+    },
+  },
+  { timeseries: true, versionKey: false },
 );
 
-userRegisterSchema.post('save', function (err, _doc, next) {
-	if (err.name === 'MongoError' && err.code === 11000) {
-	  err.status = 400;
-	  err.message = 'Email is already taken';
-	}
-	next(err);
-  });
+userSchema.post('save', handleMongooseError);
 
-  const registerSchema = Joi.object({
-	name: Joi.string().required(),
-	email: Joi.string().pattern(emailRegexp).required(),
-	password: Joi.string().min(6).required(),
-  });
-
-const loginSchema = Joi.object({
-	email: Joi.string().pattern(emailRegexp).required(),
-	password: Joi.string().min(6).required(),
-});
-
-const favoriteSchema = Joi.object({
-	subscription: Joi.string()
-		.valid(...typeSubscription)
-		.required(),
-});
-const updateAvatarSchema = Joi.object({
-	payload: { files: Joi.array().items(Joi.any()) },
-  });
-
-const User = model('user', userRegisterSchema);
-
-module.exports = {
-	User,
-	registerSchema,
-	loginSchema,
-	favoriteSchema,
-	updateAvatarSchema,
-};
+export const User = model('user', userSchema);

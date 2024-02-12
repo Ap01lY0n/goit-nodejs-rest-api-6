@@ -1,13 +1,12 @@
-const { isValidObjectId } = require('mongoose');
+import { isValidObjectId } from 'mongoose';
+import { HttpError } from '../helpers/HttpError.js';
 
-const HttpError = require('../utils');
+export const isValidId = (req, _, next) => {
+  const { contactId } = req.params;
 
-const isValidId = ({ params }, _res, next) => {
-	const { contactId } = params;
-	if (!isValidObjectId(contactId)) {
-		next(HttpError(400, `${contactId} is not valid id`));
-	}
-	next();
+  if (!isValidObjectId(contactId)) {
+    next(HttpError(400, `${contactId} is not valid id`));
+  }
+
+  next();
 };
-
-module.exports = isValidId;

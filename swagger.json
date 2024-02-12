@@ -1,0 +1,464 @@
+{
+  "openapi": "3.0.1",
+  "info": {
+    "version": "0.1.0",
+    "title": "Swagger for Registration and Movies Watchlist",
+    "description": "Showing off swagger-ui-express",
+    "license": {
+      "name": "Maksym Borovichenko",
+      "url": "https://github.com/MaksymBora/nodejs-homework-rest-api"
+    }
+  },
+  "consumes": ["application/json"],
+  "produces": ["application/json"],
+  "servers": [
+    {
+      "url": "https://www.web4you.space"
+    }
+  ],
+  "tags": [
+    {
+      "name": "Users",
+      "description": "User endpoints"
+    }
+  ],
+  "paths": {
+    "/users/register": {
+      "post": {
+        "tags": ["Users"],
+        "summary": "User registration",
+        "parameters": [],
+        "requestBody": {
+          "description": "Registration's object",
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/RegistrationRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Successful operation",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RegistrationResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad request ",
+            "content": {}
+          },
+          "409": {
+            "description": "Email in use",
+            "content": {}
+          }
+        }
+      }
+    },
+    "/users/login": {
+      "post": {
+        "tags": ["Users"],
+        "summary": "User login",
+        "parameters": [],
+        "requestBody": {
+          "description": "Login's object",
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/LoginRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful operation",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/LoginResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Email or password is wrong",
+            "content": {}
+          },
+          "403": {
+            "description": "Email is not verified",
+            "content": {}
+          }
+        }
+      }
+    },
+    "/users/logout": {
+      "post": {
+        "tags": ["Users"],
+        "summary": "User logout",
+        "description": "",
+        "parameters": [],
+        "security": [
+          {
+            "Bearer": []
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "User Logout",
+            "content": {}
+          },
+          "401": {
+            "description": "Not authorized ",
+            "content": {}
+          },
+          "403": {
+            "description": "Invalid authorization ",
+            "content": {}
+          },
+          "404": {
+            "description": "Not Found!",
+            "content": {}
+          }
+        }
+      }
+    },
+    "/verify/:verificationToken": {
+      "get": {
+        "tags": ["Users"],
+        "summary": "Verification User",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "verificationToken",
+            "required": true,
+            "type": "string",
+            "description": "verificationToken User's"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Verification successful",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/verifyResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Email not Found ",
+            "content": {}
+          }
+        }
+      }
+    },
+    "/users/verify": {
+      "post": {
+        "tags": ["Users"],
+        "summary": "resend verify email user",
+        "parameters": [],
+        "requestBody": {
+          "description": "id object",
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/resendVerifyRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Verification email sent ",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/resendVerifyResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Verification has already been passed ",
+            "content": {}
+          },
+          "401": {
+            "description": "Email not found ",
+            "content": {}
+          }
+        }
+      }
+    },
+    "/users/current": {
+      "get": {
+        "tags": ["Users"],
+        "summary": "Get info current user",
+        "parameters": [],
+        "security": [
+          {
+            "Bearer": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful operation",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/infoCurrentUserResponses"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Not authorized",
+            "content": {}
+          }
+        }
+      }
+    },
+    "/users/avatars": {
+      "patch": {
+        "tags": ["Users"],
+        "summary": "Update user's avatar",
+        "security": [
+          {
+            "Bearer": []
+          }
+        ],
+        "requestBody": {
+          "description": "User's Avatar",
+          "required": true,
+          "content": {
+            "multipart/form-data": {
+              "schema": {
+                "$ref": "#/components/schemas/userAvatarRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful operation",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/userAvatarRequest"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Image was not found, check form-data values",
+            "content": {}
+          },
+          "401": {
+            "description": "Not Found!",
+            "content": {}
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "RegistrationRequest": {
+        "type": "object",
+        "required": ["name", "email", "password"],
+        "properties": {
+          "name": {
+            "type": "string",
+            "description": "User's name",
+            "format": "email",
+            "example": "John"
+          },
+          "email": {
+            "type": "string",
+            "description": "User's email",
+            "format": "email",
+            "example": "john.stone@somemail.com"
+          },
+          "password": {
+            "type": "string",
+            "description": "User's password",
+            "example": "qwerty123"
+          }
+        }
+      },
+      "RegistrationResponse": {
+        "type": "object",
+        "properties": {
+          "status": {
+            "type": "string",
+            "description": "success"
+          },
+          "code": {
+            "type": "number",
+            "description": "201",
+            "message": "Status of registration"
+          },
+          "message": {
+            "type": "string",
+            "description": "Message"
+          }
+        },
+        "example": [
+          {
+            "status": "success",
+            "code": 201,
+            "message": "Verification Email has been Sent On Your Email"
+          }
+        ]
+      },
+      "LoginRequest": {
+        "type": "object",
+        "required": ["email", "password"],
+        "properties": {
+          "email": {
+            "type": "string",
+            "description": "User's email",
+            "format": "email",
+            "example": "test@gmail.com"
+          },
+          "password": {
+            "type": "string",
+            "description": "User's password",
+            "example": "qwerty123"
+          }
+        }
+      },
+      "LoginResponse": {
+        "type": "object",
+        "properties": {
+          "token": {
+            "type": "string",
+            "description": "User's token"
+          },
+          "user": {
+            "type": "object",
+            "properties": {
+              "email": {
+                "type": "string",
+                "description": "User's email",
+                "format": "email"
+              },
+              "subscription": {
+                "type": "string",
+                "description": "User's subscription status"
+              },
+              "name": {
+                "type": "string",
+                "description": "User's name"
+              },
+              "avatar": {
+                "type": "string",
+                "description": "Link to User's Avatar"
+              }
+            }
+          }
+        },
+        "example": [
+          {
+            "token": "eyJhbGciOiJIUzI1.NiIsInR5czZGU5ZDExMiIsIfQ.Uef18NCsHU_1PbndIRY7XBgf5T7jEUoKXQ",
+            "user": {
+              "email": "maks@email.net",
+              "subscription": "starter",
+              "name": "maks",
+              "avatar": "avatars/656b8sdd1704sdasdde9d112_avatar3.jpg"
+            }
+          }
+        ]
+      },
+      "verifyResponse": {
+        "type": "object",
+        "properties": {},
+        "example": {
+          "message": "Verification successful"
+        }
+      },
+      "resendVerifyRequest": {
+        "type": "object",
+        "required": ["email"],
+        "properties": {
+          "email": {
+            "type": "string",
+            "description": "User's email",
+            "format": "email",
+            "example": "maks@email.com"
+          }
+        }
+      },
+      "resendVerifyResponse": {
+        "type": "object",
+        "properties": {},
+        "example": {
+          "message": "Verification email sent"
+        }
+      },
+      "logoutResponse": {
+        "type": "object",
+        "properties": {},
+        "example": {}
+      },
+      "infoCurrentUserResponses": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string",
+            "description": "User name",
+            "example": "Godrik"
+          },
+          "email": {
+            "type": "string",
+            "description": "User email",
+            "format": "email",
+            "example": "godrik999@gmail.com"
+          },
+          "subscription": {
+            "type": "string",
+            "description": "user's subscription status",
+            "example": "starter"
+          },
+          "avatar": {
+            "type": "string",
+            "description": "Link to user's avatar ",
+            "example": "avatars/656b86170sdfsd12_avatar3.jpg"
+          }
+        },
+        "example": {
+          "email": "maks@email.net",
+          "subscription": "starter",
+          "name": "maks",
+          "avatar": "avatars/656b8617493de9d112_avatar3.jpg"
+        }
+      },
+      "userAvatarRequest": {
+        "type": "object",
+        "properties": {
+          "avatar": {
+            "type": "string",
+            "format": "base64",
+            "description": "User avatar"
+          }
+        }
+      }
+    },
+    "securitySchemes": {
+      "Bearer": {
+        "type": "http",
+        "scheme": "bearer",
+        "bearerFormat": "JWT"
+      }
+    }
+  }
+}
