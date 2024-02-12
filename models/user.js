@@ -17,7 +17,7 @@ const userSchema = new Schema(
     },
     name: {
       type: String,
-      required: true,
+      // required: true,
     },
     subscription: {
       type: String,

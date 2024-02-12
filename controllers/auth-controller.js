@@ -126,7 +126,7 @@ const login = async (req, res, next) => {
 
     const isMatch = await bcrypt.compare(password, user.password);
 
-    if (!isMatch) throw HttpError(403, 'Email or password is wrong');
+    if (!isMatch) throw HttpError(401, 'Email or password is wrong');
 
     const payload = {
       id: user._id,
@@ -154,7 +154,9 @@ const login = async (req, res, next) => {
 // Check current user's token
 const getCurrent = async (req, res) => {
   const { email, subscription, name, avatarURL } = req.user;
-
+  if (!req.user) {
+    return res.status(401).json({ error: 'Unauthorized' });
+  }
   res.json({ email, subscription, name, avatar: avatarURL });
 };
 

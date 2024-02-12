@@ -73,7 +73,9 @@ async function updateContact(req, res, next) {
 // ============== Update contact Status by ID ============== //
 async function updateStatusContact(req, res, next) {
   const { contactId } = req.params;
-
+  if (!req.user) {
+    return res.status(401).json({ error: 'Unauthorized' });
+  }
   const contact = await Contact.findByIdAndUpdate(contactId, req.body, {
     new: true,
   });

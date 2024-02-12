@@ -7,7 +7,7 @@ const registerSchema = Joi.object({
   }),
   password: Joi.string().min(6).required(),
   subscription: Joi.string().valid(...subscriptionList),
-  name: Joi.string().required(),
+  name: Joi.string(),
 });
 
 const emailSchema = Joi.object({
@@ -27,7 +27,7 @@ const subscriprionSchema = Joi.object({
 
 const updateAvatarSchema = Joi.object({
   payload: { files: Joi.array().items(Joi.any()) },
-});
+}); 
 
 export default {
   registerSchema,

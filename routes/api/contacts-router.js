@@ -26,18 +26,18 @@ contactsRouter.post(
 // Update contact's information
 contactsRouter.put(
   '/:contactId',
+  isValidId,
   userVerify,
   bodyValidator(contactsSchemas.contactSchemaJoi),
-  isValidId,
   contactsController.updateById,
 );
 
 // Update contact Status by ID
 contactsRouter.patch(
   '/:contactId/favorite',
+  isValidId,
   userVerify,
   bodyValidator(contactsSchemas.updateFavoriteSchema),
-  isValidId,
   contactsController.updateFavorite,
 );
 
